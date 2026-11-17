@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0c0c0d">
+  <title>SA-MP Launcher (prototipe)</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Font Awesome 6.5.1, dimuat non-blocking. Semua tombol tetap punya teks jika ikon gagal dimuat. -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <img class="art" src="art.svg" width="1600" height="900" alt="" fetchpriority="high">
+
+  <div class="launcher">
+    <header class="side">
+      <a class="brand" href="#play" aria-label="SA-MP, ke menu PLAY">
+        <span class="brand-mark"><span class="sa">SA</span>:MP</span>
+        <span class="brand-sub">San Andreas Multiplayer</span>
+      </a>
+      <nav class="nav" data-i18n-label="nav.label" aria-label="Menu utama">
+        <a href="#play"><i class="fa-solid fa-play" aria-hidden="true"></i><span data-i18n="nav.play">PLAY</span></a>
+        <a href="#servers"><i class="fa-solid fa-server" aria-hidden="true"></i><span data-i18n="nav.servers">ADD SERVER</span></a>
+        <a href="#settings"><i class="fa-solid fa-sliders" aria-hidden="true"></i><span data-i18n="nav.settings">SETTINGS</span></a>
+      </nav>
+    </header>
+
+    <main class="stage" id="main">
+      <h1 class="sr-only">SA-MP Launcher</h1>
+
+      <section class="view view-play" id="play" aria-labelledby="playName">
+        <div class="play-card">
+          <p class="kicker" data-i18n="play.kicker">Server terpilih</p>
+          <h2 id="playName" tabindex="-1"></h2>
+          <p class="addr" id="playAddr"></p>
+          <button type="button" class="btn-play" id="playBtn"><i class="fa-solid fa-play" aria-hidden="true"></i><span data-i18n="play.go">PLAY</span></button>
+          <p class="hint" id="playEmpty" hidden><span data-i18n="play.empty">Belum ada server terpilih.</span> <a href="#servers" data-i18n="play.addLink">Tambah server</a></p>
+        </div>
+      </section>
+
+      <section class="view panel" id="servers" aria-labelledby="serversTitle" hidden>
+        <div class="view-head">
+          <h2 id="serversTitle" tabindex="-1" data-i18n="srv.title">Daftar server</h2>
+          <button type="button" class="btn btn-main" id="addBtn"><i class="fa-solid fa-plus" aria-hidden="true"></i><span data-i18n="srv.add">ADD SERVER</span></button>
+        </div>
+        <ul class="list" id="serverList"></ul>
+        <p class="hint" id="serverEmpty" data-i18n="srv.empty">Belum ada server tersimpan. Tekan ADD SERVER untuk menambah yang pertama.</p>
+      </section>
+
+      <section class="view panel" id="settings" aria-labelledby="settingsTitle" hidden>
+        <h2 id="settingsTitle" tabindex="-1" data-i18n="set.title">Pengaturan</h2>
+        <form id="settingsForm" novalidate>
+          <div class="field">
+            <label for="nickname" data-i18n="set.nick">Nickname</label>
+            <input id="nickname" name="nickname" type="text" maxlength="20" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Your_Name" aria-describedby="nickErr">
+            <p class="err" id="nickErr" hidden data-i18n="err.nick"></p>
+          </div>
+          <div class="field">
+            <label for="resolution" data-i18n="set.res">Resolution</label>
+            <select id="resolution" name="resolution">
+              <option>800x600</option><option>1024x768</option><option>1280x720</option>
+              <option>1366x768</option><option>1600x900</option><option>1920x1080</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="graphics" data-i18n="set.gfx">Graphics</label>
+            <select id="graphics" name="graphics">
+              <option value="low" data-i18n="gfx.low">Rendah</option>
+              <option value="medium" data-i18n="gfx.med">Sedang</option>
+              <option value="high" data-i18n="gfx.high">Tinggi</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="volume"><span data-i18n="set.snd">Sound</span>: <output id="volumeOut" for="volume">70%</output></label>
+            <input id="volume" name="volume" type="range" min="0" max="100" step="1">
+          </div>
+          <div class="field">
+            <label for="language" data-i18n="set.lang">Language</label>
+            <select id="language" name="language">
+              <option value="id">Bahasa Indonesia</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <label class="check" for="remember"><input id="remember" name="remember" type="checkbox"><span data-i18n="set.remember">Remember Nickname</span></label>
+          <p class="hint" data-i18n="set.note"></p>
+          <div class="actions">
+            <button type="submit" class="btn btn-main"><i class="fa-solid fa-check" aria-hidden="true"></i><span data-i18n="set.apply">APPLY</span></button>
+            <button type="button" class="btn" id="resetBtn"><i class="fa-solid fa-rotate-left" aria-hidden="true"></i><span data-i18n="set.reset">RESET</span></button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <aside class="info" aria-labelledby="infoTitle">
+      <h2 id="infoTitle" data-i18n="info.title">Info server</h2>
+      <dl>
+        <div><dt data-i18n="info.name">Nama</dt><dd id="infoName"></dd></div>
+        <div><dt data-i18n="info.ip">IP Address</dt><dd class="mono" id="infoIp"></dd></div>
+        <div><dt data-i18n="info.port">Port</dt><dd class="mono" id="infoPort"></dd></div>
+        <div><dt data-i18n="info.status">Status</dt><dd id="infoStatus"></dd></div>
+        <div><dt data-i18n="info.nick">Nickname</dt><dd id="infoNick"></dd></div>
+      </dl>
+      <p class="hint" data-i18n="status.hint"></p>
+    </aside>
+
+    <footer class="foot">
+      <span id="footVersion"></span>
+      <span id="footNet"></span>
+    </footer>
+  </div>
+
+  <dialog id="serverDialog" aria-labelledby="serverDialogTitle">
+    <form id="serverForm" novalidate>
+      <h2 id="serverDialogTitle"></h2>
+      <div class="field">
+        <label for="sName" data-i18n="f.name">Server Name</label>
+        <input id="sName" type="text" maxlength="40" autocomplete="off" placeholder="Nama server" aria-describedby="sNameErr">
+        <p class="err" id="sNameErr" hidden data-i18n="err.name"></p>
+      </div>
+      <div class="field">
+        <label for="sIp" data-i18n="f.ip">IP Address</label>
+        <input id="sIp" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="203.0.113.10" aria-describedby="sIpErr">
+        <p class="err" id="sIpErr" hidden data-i18n="err.ip"></p>
+      </div>
+      <div class="field">
+        <label for="sPort" data-i18n="f.port">Port</label>
+        <input id="sPort" type="text" inputmode="numeric" autocomplete="off" placeholder="7777" aria-describedby="sPortErr">
+        <p class="err" id="sPortErr" hidden></p>
+      </div>
+      <div class="actions">
+        <button type="submit" class="btn btn-main" data-i18n="btn.save">SAVE</button>
+        <button type="button" class="btn" id="sCancel" data-i18n="btn.cancel">CANCEL</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirmDialog" aria-labelledby="confirmTitle">
+    <h2 id="confirmTitle" data-i18n="del.title">Hapus server?</h2>
+    <p id="confirmBody"></p>
+    <div class="actions">
+      <button type="button" class="btn btn-main" id="confirmYes" data-i18n="del.yes">Hapus</button>
+      <button type="button" class="btn" id="confirmNo" data-i18n="btn.cancel">CANCEL</button>
+    </div>
+  </dialog>
+
+  <dialog id="loadDialog" aria-labelledby="loadTitle">
+    <h2 id="loadTitle" data-i18n="load.title">Menyiapkan</h2>
+    <p id="loadMsg" role="status"></p>
+    <div class="bar" aria-hidden="true"><i id="loadBar"></i></div>
+    <div class="actions"><button type="button" class="btn" id="loadCancel" data-i18n="load.cancel">Batalkan</button></div>
+  </dialog>
+
+  <dialog id="resultDialog" aria-labelledby="resultTitle">
+    <h2 id="resultTitle" data-i18n="res.title">Peluncuran native belum tersedia</h2>
+    <p data-i18n="res.body"></p>
+    <div class="field">
+      <label for="resAddr">IP:Port</label>
+      <input id="resAddr" type="text" readonly>
+    </div>
+    <div class="field">
+      <label for="resNick" data-i18n="res.nick">Nickname</label>
+      <input id="resNick" type="text" readonly>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn btn-main" id="resCopy"><i class="fa-solid fa-copy" aria-hidden="true"></i><span data-i18n="res.copy">Salin alamat</span></button>
+      <button type="button" class="btn" id="resClose" data-i18n="res.close">Tutup</button>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+</body>
+</html>
